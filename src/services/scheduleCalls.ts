@@ -13,9 +13,10 @@ const redisSubscriber = getRedisSubscriber()
 async function performScheduledCall(key: string) {
   let configConnection = null
 
+  debug(`Start perform scheduled call with key - ${key}`)
+  const [, pbxId, ctcCallId] = key.split('_')
+
   try {
-    debug(`Start perform scheduled call with key - ${key}`)
-    const [, pbxId, ctcCallId] = key.split('_')
     const { dbHost } = await getPbxDetail(Number(pbxId))
 
     if (!dbHost) {
@@ -24,7 +25,6 @@ async function performScheduledCall(key: string) {
       )
       return
     }
-
     await initDbConnection(Connections.config, { database: `ipbxdb_${pbxId}`, host: dbHost })
     configConnection = getConnection(Connections.config)
     const ctcCall = await ctcCallsRepository.findOne(configConnection, Number(ctcCallId))
@@ -34,13 +34,19 @@ async function performScheduledCall(key: string) {
       return
     }
 
+    const {
+      number,
+      ctc: { callerId, inRouteExtenId, outRoutingId }
+    } = ctcCall
     debug(`Loaded scheduled call detail - ${JSON.stringify(ctcCall)}`)
-    await makeCall(pbxId, ctcCall.number)
-    await ctcCallsRepository.remove(configConnection, Number(ctcCallId))
+    await makeCall(pbxId, { number, callerId, inRouteExtenId, outRoutingId })
   } catch (error) {
     logger.error(`Error by performing scheduled call - ${error}`)
   } finally {
-    if (configConnection) configConnection.close()
+    if (configConnection) {
+      await ctcCallsRepository.remove(configConnection, Number(ctcCallId))
+      configConnection.close()
+    }
   }
 }
 

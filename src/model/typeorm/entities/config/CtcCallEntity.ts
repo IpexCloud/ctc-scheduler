@@ -1,7 +1,9 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm'
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm'
 
-@Entity({ name: 'ctc_calls' }) // same as table name
-export default class Order {
+import Ctc from './CtcEntity'
+
+@Entity({ name: 'ctc_calls' })
+export default class CtcCallEntity {
   @PrimaryColumn()
   id: number
 
@@ -10,4 +12,11 @@ export default class Order {
 
   @Column({ type: 'timestamp', precision: 3 })
   timestamp: string
+
+  @ManyToOne(
+    () => Ctc,
+    ctc => ctc.calls
+  )
+  @JoinColumn({ name: 'ctc_id' })
+  ctc: Ctc
 }

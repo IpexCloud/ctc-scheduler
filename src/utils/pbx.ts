@@ -14,6 +14,13 @@ interface PbxDetail {
   dbHost: string
 }
 
+interface CallData {
+  number: string
+  callerId: string
+  inRouteExtenId: number
+  outRoutingId: number
+}
+
 export async function getPbxDetail(pbxId: number): Promise<PbxDetail> {
   const response: { data: PbxDetail } = await axios({
     url: `${PBX_OPERATOR_URL}/pbx/${pbxId}`,
@@ -39,20 +46,21 @@ async function getToken(): Promise<string> {
   return response.data.accessToken
 }
 
-export async function makeCall(pbxId: string, number: string): Promise<string> {
+export async function makeCall(pbxId: string, callData: CallData) {
   const token = await getToken()
-  const response = await axios({
+  return axios({
     url: `${IPBX_API_URL}/calls?pbxId=${pbxId}`,
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`
     },
     data: {
-      to: number,
-      identityType: 'login',
-      identityValue: 'homer@ipex.cz'
+      to: callData.number,
+      callerId: callData.callerId,
+      fromApplication: {
+        extenId: callData.inRouteExtenId,
+        outRouteId: callData.outRoutingId
+      }
     }
   })
-
-  return response.data.dbHost
 }
