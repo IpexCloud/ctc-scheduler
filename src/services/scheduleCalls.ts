@@ -1,5 +1,6 @@
 import Debug from 'debug'
 import { getConnection } from 'typeorm'
+import {REDIS_DB_INDEX} from '~/config'
 
 import { getRedisSubscriber } from '~/config/redis'
 import { getPbxDetail, makeCall } from '@/utils/pbx'
@@ -50,12 +51,12 @@ async function performScheduledCall(key: string) {
   }
 }
 
-redisSubscriber.psubscribe('__keyevent@0__:expired')
+redisSubscriber.psubscribe(`__keyevent@${REDIS_DB_INDEX}__:expired`)
 redisSubscriber.on('pmessage', async function(pattern, _, key) {
   const [jobType] = key.split('_')
   debug(`Expired key ${key}`)
 
-  if (pattern === '__keyevent@0__:expired' && jobType === 'ctc') {
+  if (pattern === `__keyevent@${REDIS_DB_INDEX}__:expired` && jobType === 'ctc') {
     // Key example for click-to-call service: `ctc_${pbxId}_${ctcCallId}`
     await performScheduledCall(key)
   }

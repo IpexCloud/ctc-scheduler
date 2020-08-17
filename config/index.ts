@@ -4,6 +4,8 @@ config({ path: './env/.env' })
 export const PORT = process.env.PORT || '3000'
 export const REDIS_PORT = Number(process.env.REDIS_PORT)
 export const REDIS_HOST = process.env.REDIS_HOST
+export const REDIS_DB_INDEX = process.env.REDIS_DB_INDEX || 0
+
 export const ENVIRONMENT_NAME = process.env.ENVIRONMENT_NAME
 
 export const CONFIG_DATABASE_PASSWORD = process.env.CONFIG_DATABASE_PASSWORD
