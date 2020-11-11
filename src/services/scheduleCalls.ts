@@ -1,10 +1,10 @@
 import Debug from 'debug'
-import { getConnection } from 'typeorm'
-import {REDIS_DB_INDEX} from '~/config'
+import { nanoid } from 'nanoid'
 
+import { REDIS_DB_INDEX } from '~/config'
 import { getRedisSubscriber } from '~/config/redis'
 import { getPbxDetail, makeCall } from '@/utils/pbx'
-import { initDbConnection, Connections } from '~/config/mysql'
+import { initDbConnection, Databases } from '~/config/databases'
 import * as ctcCallsRepository from '@/repositories/ctcCalls'
 import { logger } from '@/utils/logger/logger'
 
@@ -26,8 +26,12 @@ async function performScheduledCall(key: string) {
       )
       return
     }
-    await initDbConnection(Connections.config, { database: `ipbxdb_${pbxId}`, host: dbHost })
-    configConnection = getConnection(Connections.config)
+
+    configConnection = await initDbConnection(Databases.pbxConfig, nanoid(), {
+      database: `ipbxdb_${pbxId}`,
+      host: dbHost
+    })
+
     const ctcCall = await ctcCallsRepository.findOne(configConnection, Number(ctcCallId))
 
     if (!ctcCall) {
