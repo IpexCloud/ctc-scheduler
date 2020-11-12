@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm'
 
-import Ctc from './CtcEntity'
+import Ctc from './Ctc.entity'
 
 @Entity({ name: 'ctc_calls' })
 export default class CtcCallEntity {
