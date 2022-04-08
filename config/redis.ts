@@ -18,7 +18,7 @@ export async function initRedisSubscriber() {
 
     subscriber.on('connect', function() {
       logger.info('Redis subscriber successfully connected')
-      resolve()
+      resolve(subscriber)
     })
   })
 }

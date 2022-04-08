@@ -1,14 +1,12 @@
-import { JsonController, Get } from 'routing-controllers'
-import { OpenAPI } from 'routing-controllers-openapi'
+import { JsonController, Get, Res } from 'routing-controllers'
+import { Response } from 'express'
 
 import { version } from '~/package.json'
 import { checkMaintenance } from '@/utils/health'
 
-@OpenAPI({ tags: ['/'] })
 @JsonController()
 export class RootController {
   @Get('/alive')
-  @OpenAPI({ summary: 'Server alive status' })
   alive() {
     return {
       status: 'OK',
@@ -18,9 +16,14 @@ export class RootController {
   }
 
   @Get('/health')
-  @OpenAPI({ summary: 'Server health status' })
-  async health() {
-    return [await checkMaintenance()]
-    return 'ok'
+  async health(@Res() response: Response) {
+    let statusCode = 200
+    const checks = (await Promise.all([checkMaintenance()])).map(check => {
+      if (check.statusCode === 503) {
+        statusCode = 503
+      }
+      return check
+    })
+    return response.status(statusCode).json(checks)
   }
 }
