@@ -14,7 +14,7 @@ const DEFAULT_RESPONSE = {
   statusCode: 200
 }
 
-export async function checkMaintenance(): Promise<ResponseFormat> {
+const checkMaintenance = async (): Promise<ResponseFormat> => {
   const start = Date.now()
   const response = { ...DEFAULT_RESPONSE, name: 'maintenance' }
   if (existsSync('maintenance')) {
@@ -25,3 +25,5 @@ export async function checkMaintenance(): Promise<ResponseFormat> {
   response.duration = end - start
   return response
 }
+
+export { checkMaintenance }

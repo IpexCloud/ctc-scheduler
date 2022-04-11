@@ -1,4 +1,5 @@
 import axios from 'axios'
+
 import {
   PBX_OPERATOR_URL,
   PBX_OPERATOR_USER,
@@ -11,7 +12,10 @@ import {
 
 interface PbxDetail {
   hostname: string
-  dbHost: string
+  configDatabase: {
+    name: string
+    host: string
+  }
 }
 
 interface CallData {
