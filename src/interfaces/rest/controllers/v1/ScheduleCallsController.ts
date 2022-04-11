@@ -1,1 +1,1 @@
-import '@/services/scheduleCalls'
+import 'services/scheduleCalls'

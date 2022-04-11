@@ -9,6 +9,7 @@ import {
   CENTRAL_API_PASSWORD,
   IPBX_API_URL
 } from '~/config'
+import cache from '~/config/cache'
 
 interface PbxDetail {
   hostname: string
@@ -18,6 +19,11 @@ interface PbxDetail {
   }
 }
 
+interface AuthInfo {
+  accessToken: string
+  expiresIn: number
+}
+
 interface CallData {
   number: string
   callerId: string
@@ -25,7 +31,7 @@ interface CallData {
   outRoutingId: number
 }
 
-export async function getPbxDetail(pbxId: number): Promise<PbxDetail> {
+const fetchPbxDetail = async (pbxId: number): Promise<PbxDetail> => {
   const response: { data: PbxDetail } = await axios({
     url: `${PBX_OPERATOR_URL}/pbx/${pbxId}`,
     auth: {
@@ -37,7 +43,19 @@ export async function getPbxDetail(pbxId: number): Promise<PbxDetail> {
   return response.data
 }
 
-async function getToken(): Promise<string> {
+const getPbxDetail = async (pbxId: number): Promise<PbxDetail> => {
+  let pbxDetail = cache.get('PBX_' + pbxId) as PbxDetail | undefined
+
+  if (pbxDetail) {
+    return pbxDetail
+  } else {
+    pbxDetail = await fetchPbxDetail(pbxId)
+    cache.set('PBX_' + pbxId, pbxDetail)
+    return pbxDetail
+  }
+}
+
+const fetchToken = async (): Promise<AuthInfo> => {
   const response = await axios({
     url: `${CENTRAL_API_URL}/v1/sso/login`,
     method: 'POST',
@@ -47,10 +65,22 @@ async function getToken(): Promise<string> {
     }
   })
 
-  return response.data.accessToken
+  return response.data
 }
 
-export async function makeCall(pbxId: string, callData: CallData) {
+const getToken = async (): Promise<string> => {
+  const authToken = cache.get('authToken') as string | undefined
+
+  if (authToken) {
+    return authToken
+  } else {
+    const auth = await fetchToken()
+    cache.set('authToken', auth.accessToken, auth.expiresIn - 60)
+    return auth.accessToken
+  }
+}
+
+const makeCall = async (pbxId: string, callData: CallData) => {
   const token = await getToken()
   return axios({
     url: `${IPBX_API_URL}/calls?pbxId=${pbxId}`,
@@ -68,3 +98,5 @@ export async function makeCall(pbxId: string, callData: CallData) {
     }
   })
 }
+
+export { getPbxDetail, makeCall }

@@ -16,9 +16,6 @@ export default class CtcEntity {
   @Column({ type: 'int', name: 'out_route_tbl_id' })
   outRoutingId: number
 
-  @OneToMany(
-    () => CtcCall,
-    call => call.ctc
-  )
+  @OneToMany(() => CtcCall, call => call.ctc)
   calls?: CtcCall[]
 }

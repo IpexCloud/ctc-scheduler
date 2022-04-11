@@ -13,10 +13,7 @@ export default class CtcCallEntity {
   @Column({ type: 'timestamp', precision: 3 })
   timestamp: string
 
-  @ManyToOne(
-    () => Ctc,
-    ctc => ctc.calls
-  )
+  @ManyToOne(() => Ctc, ctc => ctc.calls)
   @JoinColumn({ name: 'ctc_id' })
   ctc: Ctc
 }
