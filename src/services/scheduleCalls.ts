@@ -2,14 +2,13 @@ import Debug from 'debug'
 import { Connection } from 'typeorm'
 
 import { REDIS_DB_INDEX } from '~/config'
-import { getRedisSubscriber } from '~/config/redis'
+import { subscriber } from '~/config/redis'
 import { getPbxDetail, makeCall } from '@/utils/pbx'
 import { initDbConnection, Databases } from '~/config/databases'
-import * as ctcCallsRepository from '@/repositories/ctcCalls'
-import { logger } from '@/utils/logger/logger'
+import * as ctcCallsRepository from 'repositories/ctcCalls'
+import logger from '@/utils/logger/logger'
 
 const debug = Debug('ctc-scheduler')
-const redisSubscriber = getRedisSubscriber()
 
 async function performScheduledCall(key: string) {
   let configConnection: Connection | undefined = undefined
@@ -53,8 +52,8 @@ async function performScheduledCall(key: string) {
   }
 }
 
-redisSubscriber.psubscribe(`__keyevent@${REDIS_DB_INDEX}__:expired`)
-redisSubscriber.on('pmessage', async function(pattern, _, key) {
+subscriber.psubscribe(`__keyevent@${REDIS_DB_INDEX}__:expired`)
+subscriber.on('pmessage', async function (pattern: string, _: any, key: string) {
   const [jobType] = key.split('_')
   debug(`Expired key ${key}`)
 

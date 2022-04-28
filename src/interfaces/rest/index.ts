@@ -1,14 +1,11 @@
 import { useExpressServer } from 'routing-controllers'
-
 import * as express from 'express'
 
-import { setLoggerSilent } from '@/utils/logger/logger'
-import CorrelationIdMiddleware from './middlewares/correlationIdMiddleware'
 import ErrorHandlerMiddleware from './middlewares/errorHandlerMiddleware'
 
 export default function initREST(app: express.Application) {
-  // Enable logs
-  setLoggerSilent(false)
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: true }))
 
   const routingControllersOptions = {
     controllers: [__dirname + '/controllers/**/*.+(js|ts)'],
@@ -18,7 +15,11 @@ export default function initREST(app: express.Application) {
       nullResultCode: 404,
       undefinedResultCode: 204
     },
-    middlewares: [CorrelationIdMiddleware, ErrorHandlerMiddleware]
+    validation: {
+      whitelist: true,
+      forbidNonWhitelisted: true
+    },
+    middlewares: [ErrorHandlerMiddleware]
   }
   useExpressServer(app, routingControllersOptions)
 }

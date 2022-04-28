@@ -3,7 +3,7 @@
   "parserOptions": {
     "ecmaVersion": 2018
   },
-  "plugins": ["prettier", "@typescript-eslint", "jest"],
+  "plugins": ["prettier", "@typescript-eslint"],
   "globals": {
     "console": true,
     "window": true,
@@ -20,33 +20,34 @@
     "Array": true,
     "global": true,
     "Map": true,
+    "Set": true,
     "Buffer": true
   },
   "rules": {
     "no-console": 0,
     "no-undef": 1,
-    "no-unused-vars": 1,
     "semi": ["error", "never"],
     "no-useless-constructor": "off",
     "no-return-await": 2,
     "no-useless-catch": 2,
+    "@typescript-eslint/no-unused-vars": ["warn", { "ignoreRestSiblings": true }],
     "@typescript-eslint/no-useless-constructor": "error",
     "@typescript-eslint/member-delimiter-style": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
     "object-curly-spacing": ["error", "always"],
     "allowMultiplePropertiesPerLine": 0,
     "prettier/prettier": ["error"],
     "no-mixed-spaces-and-tabs": 2,
-    "sort-vars": 2
+    "sort-vars": 2,
+    "curly": ["error", "all"]
   },
   "extends": [
     "prettier",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:jest/recommended",
-    "plugin:jest/style"
+    "plugin:@typescript-eslint/recommended"
   ]
 }
