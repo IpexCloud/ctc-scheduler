@@ -1,0 +1,21 @@
+name: Build app
+on: 
+    workflow_dispatch: 
+        inputs:
+            enviroment:
+                required: true
+                type: choice
+                options:
+                    - dev
+                    - beta
+                    - prod
+
+jobs:
+    run-build:
+        name: Call handler
+        uses: IpexCloud/github-actions/.github/workflows/handler.yml@main
+        with:
+            enviroment: ${{ inputs.enviroment }}
+            app-name: "ctc-scheduler"
+            multy-value: false
+        secrets: inherit

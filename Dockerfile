@@ -1,13 +1,14 @@
-FROM node:12.14.1-buster
-
+FROM ipex/base-image:node-16.3.0-alpine-3.11-builder AS build
 WORKDIR /app
+COPY src/package*.json ./
+RUN apk add --no-cache bash
+ENV NODE_ENV=development
+RUN npm install --ignore-scripts
 
-COPY package*.json ./
-
-RUN npm i 
-
-COPY . .
-
+FROM ipex/base-image:node-16.3.0-alpine-3.11-builder
+COPY --from=build /app .
+COPY src .
 RUN npm run build
-
-CMD ["npm", "start"]
+WORKDIR /app/api
+ENV PORT 8080
+CMD [ "npm", "start"]
