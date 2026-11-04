@@ -1,14 +1,13 @@
-FROM ipex/base-image:node-16.3.0-alpine-3.11-builder AS build
+FROM ipex/base-image:node-24.22.1 AS build
 WORKDIR /app
 COPY src/package*.json ./
-RUN apk add --no-cache bash
 ENV NODE_ENV=development
-RUN npm install --ignore-scripts
+RUN npm ci --ignore-scripts
 
-FROM ipex/base-image:node-16.3.0-alpine-3.11-builder
+FROM ipex/base-image:node-24.22.1
 COPY --from=build /app .
 COPY src .
 RUN npm run build
 WORKDIR /app/api
-ENV PORT 8080
+ENV PORT=8080
 CMD [ "npm", "start"]
