@@ -22,7 +22,7 @@ interface ErrorLogFormat {
 const logger = createLogger({
   transports: [
     new transports.Console({
-      format: format.printf(data => data.message)
+      format: format.printf(data => data.message as string)
     })
   ]
 })
